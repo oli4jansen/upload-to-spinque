@@ -15,8 +15,6 @@ runs:
   steps:
     - name: checkout repo content
       uses: actions/checkout@v4
-      with:
-        sparse-checkout: data
 
     - name: authenticate
       shell: bash
@@ -28,12 +26,11 @@ runs:
       shell: bash
       run: |
         cat pipeline | while read DATASET PIPELINE PATH_TO_FILES; do
-          FILES="data/$PATH_TO_FILES"
           URL="https://rest.spinque.com/4/${{ inputs.workspace }}/dataset/$DATASET/pipeline/$PIPELINE/data/upload?replace=true"
 
           args=("-X" "PUT" "-H" "Authorization: Bearer ${{ steps.auth.outputs.access_token }}" "-H" "Content-Type: multipart/form-data" "$URL")
 
-          for FILE in $FILES; do
+          for FILE in $PATH_TO_FILES; do
             if [ -f "$FILE" ]; then
               args+=("-F" "$(basename "$FILE")=@$FILE")
             else
