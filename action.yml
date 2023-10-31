@@ -14,7 +14,6 @@ runs:
   using: "composite"
   steps:
     - name: checkout repo content
-      shell: bash
       uses: actions/checkout@v4
       with:
         sparse-checkout: data
