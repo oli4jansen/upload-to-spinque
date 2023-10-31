@@ -1,0 +1,45 @@
+name: 'Upload to Spinque'
+description: 'Upload data to Spinque Desk'
+inputs:
+  workspace:
+    description: 'Spinque Desk workspace'
+    required: true
+  client_id:
+    description: 'Client ID'
+    required: true
+  client_secret:
+    description: 'Client secret'
+    required: true
+runs:
+  using: "composite"
+  runs-on: ubuntu-latest
+  steps:
+    - name: checkout repo content
+      uses: actions/checkout@v4
+      with:
+        sparse-checkout: data
+
+    - name: authenticate
+      id: auth
+      run: |
+        echo "access_token=$(curl 'https://login.spinque.com/oauth/token' -X POST -d 'client_id=${{ inputs.client_id }}&client_secret=${{ inputs.client_secret }}&grant_type=client_credentials&audience=https://rest.spinque.com/' | jq '.access_token')" >> $GITHUB_OUTPUT
+
+    - name: upload data to pipeline
+      run: |
+        cat pipeline | while read DATASET PIPELINE PATH_TO_FILES; do
+          FILES="data/$PATH_TO_FILES"
+          URL="https://rest.spinque.com/4/${{ inputs.workspace }}/dataset/$DATASET/pipeline/$PIPELINE/data/upload?replace=true"
+
+          args=("-X" "PUT" "-H" "Authorization: Bearer ${{ steps.auth.outputs.access_token }}" "-H" "Content-Type: multipart/form-data" "$URL")
+
+          for FILE in $FILES; do
+            if [ -f "$FILE" ]; then
+              args+=("-F" "$(basename "$FILE")=@$FILE")
+            else
+              echo "File $FILE not found."
+            fi
+          done
+
+          curl "${args[@]}"
+
+        done
