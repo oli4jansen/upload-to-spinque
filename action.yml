@@ -12,19 +12,21 @@ inputs:
     required: true
 runs:
   using: "composite"
-  runs-on: ubuntu-latest
   steps:
     - name: checkout repo content
+      shell: bash
       uses: actions/checkout@v4
       with:
         sparse-checkout: data
 
     - name: authenticate
+      shell: bash
       id: auth
       run: |
         echo "access_token=$(curl 'https://login.spinque.com/oauth/token' -X POST -d 'client_id=${{ inputs.client_id }}&client_secret=${{ inputs.client_secret }}&grant_type=client_credentials&audience=https://rest.spinque.com/' | jq '.access_token')" >> $GITHUB_OUTPUT
 
     - name: upload data to pipeline
+      shell: bash
       run: |
         cat pipeline | while read DATASET PIPELINE PATH_TO_FILES; do
           FILES="data/$PATH_TO_FILES"
