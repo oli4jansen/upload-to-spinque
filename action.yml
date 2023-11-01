@@ -22,16 +22,7 @@ runs:
       run: |
         echo "access_token=$(curl 'https://login.spinque.com/oauth/token' -X POST -d 'client_id=${{ inputs.client_id }}&client_secret=${{ inputs.client_secret }}&grant_type=client_credentials&audience=https://rest.spinque.com/' | jq '.access_token')" >> $GITHUB_OUTPUT
 
-    - uses: dorny/paths-filter@v2
-      id: changes
-      with:
-        base: HEAD
-        filters: |
-          data:
-            - 'data/**'
-
     - name: upload data to pipeline
-      if: ${{ steps.changes.outputs.data }}
       shell: bash
       run: |
         cat pipeline | while read DATASET PIPELINE PATH_TO_FILES; do
