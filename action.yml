@@ -31,7 +31,7 @@ runs:
             - 'data/**'
 
     - name: upload data to pipeline
-      if: steps.changes.outputs.data
+      if: ${{ steps.changes.outputs.data }}
       shell: bash
       run: |
         cat pipeline | while read DATASET PIPELINE PATH_TO_FILES; do
