@@ -10,11 +10,15 @@ inputs:
   client_secret:
     description: 'Client secret'
     required: true
+  ref:
+    description: 'The branch, tag or SHA to checkout and upload to Spinque'
 runs:
   using: "composite"
   steps:
     - name: checkout repo content
       uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.ref }}
 
     - name: authenticate
       shell: bash
