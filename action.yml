@@ -29,8 +29,9 @@ runs:
     - name: upload data to pipeline
       shell: bash
       run: |
-        cat pipeline | while read DATASET PIPELINE PATH_TO_FILES; do
-          URL="https://rest.spinque.com/4/${{ inputs.workspace }}/dataset/$DATASET/pipeline/$PIPELINE/data/upload?replace=true"
+        cat pipeline | while read DATASET PIPELINE PATH_TO_FILES CONFIG; do
+          CONFIG="${CONFIG:-default}"
+          URL="https://rest.spinque.com/4/${{ inputs.workspace }}/dataset/$DATASET/pipeline/$PIPELINE/data/upload?replace=true&config=${{ inputs.config }}"
 
           args=("-X" "PUT" "-H" "Authorization: Bearer ${{ steps.auth.outputs.access_token }}" "-H" "Content-Type: multipart/form-data" "$URL")
 
