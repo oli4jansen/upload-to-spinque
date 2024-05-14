@@ -38,11 +38,14 @@ runs:
 
           for FILE in $PATH_TO_FILES; do
             if [ -f "$FILE" ]; then
+              echo "Adding $FILE to request body"
               args+=("-F" "$(basename "$FILE")=@$FILE")
             else
               echo "File $FILE not found."
             fi
           done
+
+          echo "$args"
 
           curl "${args[@]}"
 
